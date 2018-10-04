@@ -39,7 +39,10 @@ else
     done
 
     for fichier in $2/*; do
-      convertir $fichier $3
+      if [ ! `file -ib "$fichier" | cut -d ';' -f1` = "image/png" ]; then
+        convertir $fichier $3
+        rm $fichier
+      fi
     done
 
   else
