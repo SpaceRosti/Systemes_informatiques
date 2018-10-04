@@ -11,12 +11,11 @@ makeCopy(){
 }
 
 convertir(){
+  NAME=`echo "$1" | cut -d'.' -f1`
   if [ ! -z $2 ]; then
-    #convert -resize $2 $1 $1.png
-    #rm $1
+    convert -resize $2 $1 $NAME.png
   else
-    #convert $1 $1.png
-    #rm $1
+    convert $1 $NAME.png
   fi
 }
 
@@ -32,7 +31,6 @@ else
       mkdir $2
       for fichier in $1/*;do
         makeCopy "$fichier" $2
-        convertir $3
       done
     fi
 
