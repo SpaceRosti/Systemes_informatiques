@@ -5,6 +5,7 @@
 #include <time.h>
 #include <string.h>
 #include <dirent.h>
+#include <stdlib.h>
 
 void chainePermisison(struct stat fileInfo,char* retour){ //construit une chaîne de carctère pour les permissions
 
@@ -38,33 +39,42 @@ void afficherInfo(char *alire){ // affiche les informations sur un fichier
   char buffer[80] = "";
   char permi[15]= "";
   time_t temps;
-  struct tm wtf; // demander ce que c'est
+  struct tm wtf;
 
-  if (stat(alire,&fileInfo)==-1){
+  if (stat(alire,&fileInfo)==-1){ // lis les infos de alire et les met dans fileInfo
     perror("stat");
     exit(0);
-  } // lis les infos de alire et les met dans fileInfo
+  }
 
   chainePermisison(fileInfo,permi);
+
   temps = fileInfo.st_mtime;
+
+  // récupère et convertit le temps dans un format lisible
   localtime_r(&temps,&wtf);
   strftime(buffer,80,"%c",&wtf);
 
+  //affiche toutes les informations
   printf("%s\t%ld\t%s\t%s\n",permi,fileInfo.st_size,buffer,alire);
 }
 
-void afficheInfoComplet(char *alire){ // ne gère pas les lien et fait tout apparaitre dans n'importe quel ordre
-  afficherInfo(alire);
-  char *temp[20];
+void afficheInfoComplet(char *alire){
   struct stat fileInfo;
-  stat(alire,&fileInfo);
-  if(S_ISDIR(fileInfo.st_mode)){ // si c'est un repertoire
+  if(stat(alire,&fileInfo)==-1){
+    perror("stat");
+    exit(0);
+  }
+
+  afficherInfo(alire);
+
+  char *temp[20];
+  if(S_ISDIR(fileInfo.st_mode)){ // si aLire est un repertoire
     struct dirent *de;
-    DIR *dr = opendir(alire); // besoin de faire un test ou pas ?
-    while ((de = readdir(dr)) != NULL)
+    DIR *dr = opendir(alire);
+    while ((de = readdir(dr)) != NULL) // lis les fichiers/dossier contenu dans le répertoire
       if (strcmp(de->d_name,"..") && strcmp(de->d_name,".")){
         strcpy(temp,alire);
-        afficheInfoComplet(strcat(strcat(temp,"/"),de->d_name));
+        afficheInfoComplet(strcat(strcat(temp,"/"),de->d_name)); //  appel récusif de la fonction pour gérer l'affichage des fichier/dossiers
       }
     closedir(dr);
   }
