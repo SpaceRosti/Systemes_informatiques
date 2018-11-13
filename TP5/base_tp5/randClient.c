@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
 
   /* Initialisation */
 
-  
+
   if (argc != 4) {
     fprintf(stderr, "USAGE: %s <host> <port> <numBytes>\n", argv[0]);
     exit(EXIT_FAILURE);
@@ -56,17 +56,17 @@ int main(int argc, char *argv[]) {
   numBytes = atoi(argv[3]);
 
   /* Connection */
-  
+
   sock = makeSocket( host, port );
 
   /* Envoie de la requête */
-  
+
   if( write(sock,&numBytes,sizeof(numBytes)) < sizeof(numBytes) ) {
     die( "Cannot send the filename to retrieve" );
   }
 
   /* Reception de la réponse */
-  
+
   data = (char*) malloc( numBytes );
 
   while( rcvd < numBytes ) {
@@ -91,6 +91,6 @@ int main(int argc, char *argv[]) {
   /* Libération des resources */
   free( data );
   close(sock);
-  
+
   exit(EXIT_SUCCESS);
-}        
+}
