@@ -6,3 +6,6 @@ main.o: main.c common.h
 
 common.o: common.c
 	gcc -c common.c -o common.o
+
+clean:
+	rm -rf *.o client
