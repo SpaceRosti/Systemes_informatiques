@@ -10,12 +10,18 @@
 #include "jobs.h"
 #include "common.h"
 
-pid_t pidEnfant = 0;
+// pour retenir les anciennes sigaction
 struct sigaction oldAction;
+struct sigaction oldSIGINT;
 
+extern pid_t backgroundPid;
+pid_t frontPid;
+
+// cree processus enfant en forground
 void creeProcessusEnfant(char **argv,int argc){
   pid_t pid = fork();
   if(pid>0){ // Parent
+    frontPid = pid;
     int status;
     wait(&status);
     int exit_status = WEXITSTATUS(status);
@@ -25,8 +31,10 @@ void creeProcessusEnfant(char **argv,int argc){
   else if(pid == 0){ // Enfant
     char temp[100];
     memset(temp,0,100);
-    sprintf(temp,"/bin/%s",argv[0]);
+    sprintf(temp,"/bin/%s",argv[0]); // va chercher la commande dans /bin
     execv(temp,argv);
+    // si la commande ne peut pas être executée,
+    // quitte le processus avec une erreur
     exit(EXIT_FAILURE);
   }
   else{ // Erreur
@@ -35,6 +43,8 @@ void creeProcessusEnfant(char **argv,int argc){
   }
 }
 
+// controle si le symbole "&" est situé à la fin de la commande passé en
+// paramètre(argv).
 int detectBackground(char **argv,int argc){
   if(!strcmp(argv[argc-1],"&")){
     argv[argc-1] = NULL;
@@ -45,20 +55,24 @@ int detectBackground(char **argv,int argc){
   }
 }
 
+// cree un processus enfant en backgroun
 void creeProcessusEnfantBackground(char **argv,int argc){
-  gestionSignal();
+  gestionSignal();// change la gestion du signal SIGCHLD
   pid_t pid = fork();
   if(pid>0){ // Parent
-    pidEnfant = pid;
-    sleep(1);
+    backgroundPid = pid; // stocke le pid de l'enfant
     return;
   }
   else if(pid == 0){ // Enfant
     char temp[100];
     memset(temp,0,100);
+    // va cherche la commande à executer dans /bin
     sprintf(temp,"/bin/%s",argv[0]);
+    // redirige stdout vers /dev/null
     if ((freopen("/dev/null", "w", stdout)) != NULL){
       execv(temp,argv);
+      // si la commande ne peut pas être executée,
+      // quitte le processus avec une erreur
       exit(EXIT_FAILURE);
     }
     else{
@@ -71,10 +85,12 @@ void creeProcessusEnfantBackground(char **argv,int argc){
   }
 }
 
-static void handleEnd(int sig, siginfo_t *siginfo, void *context){
+// handler de SIGCHLD
+void handleEnd(int sig, siginfo_t *siginfo, void *context){
   int status;
   pid_t pid;
-  pid = waitpid(pidEnfant,&status,0);
+  // supprime les traces de l'enfant une fois que celui-ci est mort
+  pid = waitpid(backgroundPid,&status,0);
   int exit_status = WEXITSTATUS(status);
   printf("Background job %d exited with code %d\n",pid,exit_status);
   if (sigaction(SIGCHLD, &oldAction, NULL) < 0) {
@@ -82,11 +98,14 @@ static void handleEnd(int sig, siginfo_t *siginfo, void *context){
   }
 }
 
+// change la gestion du signal SIGCHLD
 void gestionSignal(){
   struct sigaction act;
 	memset (&act, '\0', sizeof(act));
 
-  act.sa_flags = SA_SIGINFO;
+  // SA_SIGINFO pour utiliser sa_sigaction et
+  // SA_RESTART pour relancer les fonctions bloquantes
+  act.sa_flags = SA_SIGINFO|SA_RESTART;
   act.sa_sigaction = handleEnd;
 
   if (sigaction(SIGCHLD, &act, &oldAction) < 0) {

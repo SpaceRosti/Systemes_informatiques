@@ -1,7 +1,7 @@
 shell: main.o shell.o common.o builtin.o jobs.o
 	gcc main.o shell.o common.o builtin.o jobs.o -o shell
 
-main.o: main.c common.h builtin.h shell.h
+main.o: main.c common.h builtin.h shell.h jobs.h
 	gcc -Wall -c main.c -o main.o
 
 shell.o: shell.c common.h
