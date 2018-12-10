@@ -29,10 +29,7 @@ void creeProcessusEnfant(char **argv,int argc){
     return;
   }
   else if(pid == 0){ // Enfant
-    char temp[100];
-    memset(temp,0,100);
-    sprintf(temp,"/bin/%s",argv[0]); // va chercher la commande dans /bin
-    execv(temp,argv);
+    execvp(argv[0],argv);
     // si la commande ne peut pas être executée,
     // quitte le processus avec une erreur
     exit(EXIT_FAILURE);
@@ -64,13 +61,9 @@ void creeProcessusEnfantBackground(char **argv,int argc){
     return;
   }
   else if(pid == 0){ // Enfant
-    char temp[100];
-    memset(temp,0,100);
-    // va cherche la commande à executer dans /bin
-    sprintf(temp,"/bin/%s",argv[0]);
     // redirige stdout vers /dev/null
     if ((freopen("/dev/null", "w", stdout)) != NULL){
-      execv(temp,argv);
+      execvp(argv[0],argv);
       // si la commande ne peut pas être executée,
       // quitte le processus avec une erreur
       exit(EXIT_FAILURE);
