@@ -23,9 +23,9 @@ void pizza(){
   srand(time(NULL));
   float tps = rand();
   tps = (tps/RAND_MAX)*ATTENTE_MAX+1;
-  printf("pépare la pizza pendant %f secondes\n",tps);
+  printf("Prépare la pizza pendant %f secondes\n",tps);
   sleep(tps);
-  printf("pizza prete\n");
+  printf("Pizza prête\n");
 }
 
 void sharedMemory(){
@@ -81,10 +81,10 @@ void action(sem_t *sem,int *SHMfd){
       compteurPizza++;
       sem_wait(sem);
       *SHMfd = *SHMfd + 1;
-      printf("Pizza mise dans l'étagère, nombre de pizzas: %d\n",*SHMfd);
+      printf("Pizza mise dans l'étagère, nombre de pizza(s) totale: %d\n",*SHMfd);
       if(*SHMfd == 3){
         dodo = 1;
-        printf("Le cuisinier se repose\n");
+        printf("La cuisinière se repose\n");
       }
       sem_post(sem);
     }

@@ -11,6 +11,8 @@
 #include "common.h"
 #include "waiter.h"
 
+#define VITESSE_SERVEUSE 3
+
 int main(){
   sersPizza();
 }
@@ -21,7 +23,7 @@ void sersPizza(){
   sem_t *sema;
 
   if( (fd = shm_open("etagere", O_RDWR, S_IRUSR | S_IWUSR)) == -1){
-    die("shm_open");
+    die("shm_open etagere");
   }
   SHMfd = mmap(NULL,sizeof(int),PROT_READ | PROT_WRITE,MAP_SHARED,fd,0);
   if(SHMfd == MAP_FAILED){
@@ -57,11 +59,11 @@ void sersPizza(){
 void action(sem_t *sem,int *SHMfd){
   int compteurPizza = 0;
   while(compteurPizza < 10){
-    sleep(3);
+    sleep(VITESSE_SERVEUSE);
     sem_wait(sem);
     if(*SHMfd > 0){
       *SHMfd = *SHMfd - 1;
-      printf("une pizza en moins, restantes: %d\n",*SHMfd);
+      printf("Pizza servie,nombre de pizza restante: %d\n",*SHMfd);
       compteurPizza++;
     }
     sem_post(sem);
