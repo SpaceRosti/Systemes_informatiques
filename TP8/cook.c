@@ -62,6 +62,8 @@ void sharedMemory(){
 
   action(&sem1,SHMfd);
 
+  printf("Le cuisinier a préparé 1010 pizzas, il rentre chez lui.\n");
+
   if(munmap(SHMfd, sizeof(int)) == -1){
     die("munmap SHMfd");
   }

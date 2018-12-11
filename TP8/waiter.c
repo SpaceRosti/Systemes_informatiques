@@ -11,7 +11,7 @@
 #include "common.h"
 #include "waiter.h"
 
-#define VITESSE_SERVEUSE 3
+#define VITESSE_SERVEUSE 2
 
 int main(){
   sersPizza();
@@ -43,6 +43,8 @@ void sersPizza(){
 
   action(sema,SHMfd);
 
+  printf("Le serveur a fini de servir les 1010 pizzas.\n");
+
   if(munmap(SHMfd, sizeof(int)) == -1){
     die("munmap");
   }
@@ -54,6 +56,7 @@ void sersPizza(){
   close(fd);
   shm_unlink("etagere");
   shm_unlink("semPartage");
+  printf("Le serveur a fermé l'étagère et la semaphore.\n");
 }
 
 void action(sem_t *sem,int *SHMfd){
