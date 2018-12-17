@@ -64,7 +64,7 @@ void action(sem_t *sem,int *SHMfd){
     sem_wait(sem);
     if(*SHMfd > 0){
       			// s'il y a une(des) pizza(s) disponible (SHMfd : la mémoire partagée, un compteur qui équivaut au nombre de pizza sur l'étagère)
-      *SHMfd = *SHMfd - 1; // on sert la pizza donc in décrémente le compteur de pizzas sur l'étagère
+      *SHMfd = *SHMfd - 1; // on sert la pizza donc on décrémente le compteur de pizzas sur l'étagère
       printf("Pizza servie,nombre de pizza restante: %d\n",*SHMfd);
       compteurPizza++; // on incrémente le compteur de pizzas totales 
     }

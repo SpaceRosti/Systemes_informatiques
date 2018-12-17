@@ -49,13 +49,13 @@ void sharedMemory(){
     die("mmap etagere");
   }
 
-  // on créer notre sémaphore
+  // on crée notre sémaphore
   sem_t *semaphore = sem_open("/semTest", O_CREAT | O_EXCL,S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP,1);
   if (semaphore == SEM_FAILED) {
     die("sem_open");
   }
 
-  // on lance la fonction action ()à qui on passe la sémaphore et la mémoire partagée)  (voir commentaires de la fonction)
+  // on lance la fonction action() à qui on passe la sémaphore et la mémoire partagée)  (voir commentaires de la fonction)
   action(semaphore,SHMfd);
 
   printf("Le cuisinier a préparé 1010 pizzas, il rentre chez lui.\n");
